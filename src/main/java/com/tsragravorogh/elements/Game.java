@@ -60,4 +60,8 @@ public class Game {
     public void setFightHistory(ArrayList<Round> fightHistory) {
         this.fightHistory = fightHistory;
     }
+
+    public Player getNext(Player player) {
+        return players.getNext(player);
+    }
 }
