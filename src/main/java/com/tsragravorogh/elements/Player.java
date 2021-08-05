@@ -34,22 +34,11 @@ public class Player {
         this.playerCards = playerCards;
     }
 
-    private String getAllCardsToString(ArrayList<Card> cards) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        for (Card c : cards) {
-            sb.append(c.toString());
-            sb.append(" ");
-        }
-        sb.append("}");
-        return sb.toString();
-    }
-
     @Override
     public String toString() {
         return "\nPlayer{" +
                 "name='" + name + '\'' +
-                ", playerCards=" + getAllCardsToString(getPlayerCards()) +
+                ", playerCards=" + playerCards +
                 '}';
     }
 }

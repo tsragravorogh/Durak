@@ -7,16 +7,18 @@ import java.util.*;
 
 public class GameService {
     public void play(Game g, int playersCount) {
-        //TODO 'initPlayers'
-        //TODO 'initCards'
-        //TODO 'dealCardsToPlayers'
+        initPlayers(g, playersCount);
+        initCards(g);
+        dealCardsToPlayers(g);
+        // TODO init the game
+        System.out.println(g.getPlayers().toString());
     }
 
     private void initPlayers(Game g, int count) {
         CyclicLinkedList<Player> players = new CyclicLinkedList<>();
 
         if(count > 1 && count < 7){
-            for (int i = 0; i < count; i++) {
+            for (int i = 1; i <= count; i++) {
                 players.addLast(new Player("Player [" + i + "]"));
             }
         }
@@ -54,11 +56,23 @@ public class GameService {
             for(int j = 0; j < 6; j++) {
                 cardsToPlayer.add(deck.removeLast());
             }
-            cardsPlayer.put(players.get(i), cardsToPlayer);
+            players.get(i).setPlayerCards(cardsToPlayer);
         }
 
-        g.setCardsPlayer(cardsPlayer);
+        g.setPlayers(players);
         g.setDeck(deck);
+    }
+
+    //init the game
+
+    private void initGame(Game g) {
+        while (isGameAlive(g)) {
+            
+        }
+    }
+
+    private boolean isGameAlive(Game g){
+        return g.getPlayers().size() > 1;
     }
 
     private Player getSourcePlayer(Game g, boolean isPickedUp, Player playerBefore) {

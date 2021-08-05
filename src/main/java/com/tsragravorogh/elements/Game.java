@@ -4,15 +4,16 @@ import com.tsragravorogh.utils.CyclicLinkedList;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class Game {
     private Card trump;
     private LinkedList<Card> deck;
     private ArrayList<Card> roundCards;
     private CyclicLinkedList<Player> players;
-    private Map<Player, ArrayList<Card>> cardsPlayer;
     private ArrayList<Round> fightHistory;
+
+    public Game() {
+    }
 
     public Card getTrump() {
         return trump;
@@ -44,14 +45,6 @@ public class Game {
 
     public void setPlayers(CyclicLinkedList<Player> players) {
         this.players = players;
-    }
-
-    public Map<Player, ArrayList<Card>> getCardsPlayer() {
-        return cardsPlayer;
-    }
-
-    public void setCardsPlayer(Map<Player, ArrayList<Card>> cardsPlayer) {
-        this.cardsPlayer = cardsPlayer;
     }
 
     public ArrayList<Round> getFightHistory() {
