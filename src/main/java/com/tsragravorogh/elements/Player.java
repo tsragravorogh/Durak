@@ -14,6 +14,10 @@ public class Player {
         this.playerCards = playerCards;
     }
 
+    public Player(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

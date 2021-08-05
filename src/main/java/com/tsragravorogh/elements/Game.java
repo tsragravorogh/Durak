@@ -3,29 +3,30 @@ package com.tsragravorogh.elements;
 import com.tsragravorogh.utils.CyclicLinkedList;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class Game {
-    private Suit trump;
-    private ArrayList<Card> deck;
+    private Card trump;
+    private LinkedList<Card> deck;
     private ArrayList<Card> roundCards;
     private CyclicLinkedList<Player> players;
     private Map<Player, ArrayList<Card>> cardsPlayer;
     private ArrayList<Round> fightHistory;
 
-    public Suit getTrump() {
+    public Card getTrump() {
         return trump;
     }
 
-    public void setTrump(Suit trump) {
+    public void setTrump(Card trump) {
         this.trump = trump;
     }
 
-    public ArrayList<Card> getDeck() {
+    public LinkedList<Card> getDeck() {
         return deck;
     }
 
-    public void setDeck(ArrayList<Card> deck) {
+    public void setDeck(LinkedList<Card> deck) {
         this.deck = deck;
     }
 
