@@ -11,6 +11,7 @@ public class Game {
     private ArrayList<Card> roundCards;
     private CyclicLinkedList<Player> players;
     private ArrayList<Round> fightHistory;
+    private ArrayList<Card> cardsOnDesk;
 
     public Game() {
     }
@@ -57,5 +58,13 @@ public class Game {
 
     public Player getNext(Player player) {
         return players.getNext(player);
+    }
+
+    public ArrayList<Card> getCardsOnDesk() {
+        return cardsOnDesk;
+    }
+
+    public void setCardsOnDesk(ArrayList<Card> cardsOnDesk) {
+        this.cardsOnDesk = cardsOnDesk;
     }
 }

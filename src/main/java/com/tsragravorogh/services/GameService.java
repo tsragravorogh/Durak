@@ -79,7 +79,56 @@ public class GameService {
                 source = getSourcePlayer(g, isPickedUp, source);
                 target = getTargetPlayer(g, source);
             }
+            attack(g, source, target);
+
+
+            //Round round = new Round(source, target, );
         }
+    }
+
+    private void attack(Game g, Player source, Player target) {
+        ArrayList<Card> sourceCards = sortCards(source.getPlayerCards());
+        //ArrayList<Card> targetCards = sortCards(target.getPlayerCards());
+
+        putSourceCards(g, source);
+        putSimilarCards(g, target);
+    }
+
+    private void putSimilarCards(Game g, Player target) {
+        if (g.getPlayers().size() == 2) {
+            return;
+        }
+
+        int count = Math.min(target.getPlayerCards().size(), 6);
+        ArrayList<Card> cardsOnDesk = g.getCardsOnDesk();
+        ArrayList<Card> cardsToAdd = new ArrayList<>(cardsOnDesk);
+
+        for(int i = 0; i < g.getPlayers().size(); i++) {
+            ArrayList<Card> playerCards = g.getPlayers().get(i).getPlayerCards();
+            Iterator<Card> playerCardsIterator = playerCards.iterator();
+
+            for (Card c : cardsOnDesk) {
+                while (playerCardsIterator.hasNext()) {
+                    Card playerCard = playerCardsIterator.next();
+                    if (c.getFace().getRank() == playerCard.getFace().getRank() && count != 0) {
+                        cardsToAdd.add(playerCard);
+                        playerCardsIterator.remove();
+                        count--;
+                    }
+                }
+            }
+        }
+        // TODO delete the player if he doesn't have any cards
+    }
+
+    private void putSourceCards(Game g, Player source) {
+        ArrayList<Card> cards = g.getCardsOnDesk();
+        cards.add(source.getPlayerCards().remove(0));
+        g.setCardsOnDesk(cards);
+    }
+
+    private ArrayList<Card> sortCards(ArrayList<Card> cards) {
+        return cards.stream().sorted(Comparator.comparingInt(c -> c.getFace().getRank())).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private Player getFirstSourcePlayer(Game g) {

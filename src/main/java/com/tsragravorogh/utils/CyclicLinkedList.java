@@ -79,7 +79,6 @@ public class CyclicLinkedList<T> {
         }
     }
 
-
     public T playerBeforePlayer(T player) {
         ListItem curr = head;
         while (curr.next != null) {
