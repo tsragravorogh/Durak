@@ -1,13 +1,14 @@
 package com.tsragravorogh.elements;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Round {
     private Player source;
     private Player target;
-    private List<Fight> fights;
+    private ArrayList<Fight> fights;
 
-    public Round(Player source, Player target, List<Fight> fights) {
+    public Round(Player source, Player target, ArrayList<Fight> fights) {
         this.source = source;
         this.target = target;
         this.fights = fights;
@@ -33,7 +34,7 @@ public class Round {
         return fights;
     }
 
-    public void setFights(List<Fight> fights) {
+    public void setFights(ArrayList<Fight> fights) {
         this.fights = fights;
     }
 }

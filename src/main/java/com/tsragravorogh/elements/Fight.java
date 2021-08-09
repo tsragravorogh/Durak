@@ -9,6 +9,11 @@ public class Fight {
         this.up = up;
     }
 
+    public Fight(Card down) {
+        this.down = down;
+        this.up = null;
+    }
+
     public void setDown(Card down) {
         this.down = down;
     }

@@ -55,6 +55,15 @@ public class CyclicLinkedList<T> {
             }
         }
     }
+
+    public void removePlayer(int index) {
+        ListItem curr = head;
+        while (index != 0) {
+            index--;
+            curr = curr.next;
+        }
+        removePlayer(curr.value);
+    }
     public void removePlayer(T player) {
         ListItem curr = head;
         while (curr.next != null) {

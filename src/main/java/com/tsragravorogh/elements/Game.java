@@ -8,10 +8,10 @@ import java.util.LinkedList;
 public class Game {
     private Card trump;
     private LinkedList<Card> deck;
-    private ArrayList<Card> roundCards;
     private CyclicLinkedList<Player> players;
     private ArrayList<Round> fightHistory;
     private ArrayList<Card> cardsOnDesk;
+    private boolean isPickedUp;
 
     public Game() {
     }
@@ -30,14 +30,6 @@ public class Game {
 
     public void setDeck(LinkedList<Card> deck) {
         this.deck = deck;
-    }
-
-    public ArrayList<Card> getRoundCards() {
-        return roundCards;
-    }
-
-    public void setRoundCards(ArrayList<Card> roundCards) {
-        this.roundCards = roundCards;
     }
 
     public CyclicLinkedList<Player> getPlayers() {
@@ -66,5 +58,14 @@ public class Game {
 
     public void setCardsOnDesk(ArrayList<Card> cardsOnDesk) {
         this.cardsOnDesk = cardsOnDesk;
+    }
+
+    public boolean isPickedUp() {
+        return isPickedUp;
+    }
+
+    public void setPickedUp(boolean pickedUp) {
+        isPickedUp = pickedUp;
+        if (pickedUp) System.out.println("потянул");
     }
 }

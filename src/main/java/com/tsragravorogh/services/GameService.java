@@ -11,7 +11,26 @@ public class GameService {
         initPlayers(g, playersCount);
         initCards(g);
         dealCardsToPlayers(g);
-        //initGame(g);
+        initHistory(g);
+        initGame(g);
+
+//        initPlayers(g, playersCount);
+//        initCards(g);
+//        dealCardsToPlayers(g);
+//
+//        Player pl1 = g.getPlayers().get(0);
+//        Player pl2 = g.getPlayers().get(1);
+//        Player pl3 = g.getPlayers().get(2);
+//        Player pl4 = g.getPlayers().get(3);
+//
+//        Player source = getFirstSourcePlayer(g);
+//        Player target = getTargetPlayer(g, source);
+//        System.out.println(source + "   1");
+//        System.out.println(target + "   1");
+//        source = getSourcePlayer(g, source);
+//        target = getTargetPlayer(g, source);
+//        System.out.println(source + "   2");
+//        System.out.println(target + "   2");
         // TODO init the game
     }
 
@@ -34,11 +53,16 @@ public class GameService {
             }
         }
 
+        deck = shuffle(deck);
+
         Card trump = deck.getFirst();
         g.setTrump(trump);
-
-        deck = shuffle(deck);
         g.setDeck(deck);
+    }
+
+    private void initHistory(Game g) {
+        ArrayList<Round> rounds = new ArrayList<>();
+        g.setFightHistory(rounds);
     }
 
     private LinkedList<Card> shuffle(LinkedList<Card> cards) {
@@ -57,7 +81,6 @@ public class GameService {
             }
             players.get(i).setPlayerCards(cardsToPlayer);
         }
-
         g.setPlayers(players);
         g.setDeck(deck);
     }
@@ -65,31 +88,134 @@ public class GameService {
     // TODO init the game
 
     private void initGame(Game g) {
-        while (isGameAlive(g)) {
-            Player source = null;
-            Player target;
+        Player source = null;
+        Player target;
 
-            boolean isPickedUp = false;
+        while (isGameAlive(g)) {
+
             //TODO choice of the user who plays first
             if(isFirstRound(g)){
                 source = getFirstSourcePlayer(g);
+                //System.out.println(source + " FIRST ROUND SOURCE");
                 target = g.getPlayers().getNext(source);
+                //System.out.println(target + " FIRST ROUND TARGET");
             }
             else{
-                source = getSourcePlayer(g, isPickedUp, source);
+                source = getSourcePlayer(g, source);
+                //System.out.println(source + " SOURCE");
                 target = getTargetPlayer(g, source);
+                //System.out.println(target + " TARGET");
             }
+            System.out.println(source.getName() + " напал на " + target.getName());
             attack(g, source, target);
+            defense(g, source, target);
+            if(g.isPickedUp()) {
+                System.out.println(target.getName() + " потянул");
+            } else {
+                System.out.println(target.getName() + " отбился");
+            }
 
+            if (g.getDeck().size() != 0) {
+                getNeedCard(g);
+            }
 
-            //Round round = new Round(source, target, );
+            removeWinningPlayers(g);
         }
     }
 
-    private void attack(Game g, Player source, Player target) {
-        ArrayList<Card> sourceCards = sortCards(source.getPlayerCards());
-        //ArrayList<Card> targetCards = sortCards(target.getPlayerCards());
+    private void removeWinningPlayers(Game g) {
+        ArrayList<Player> playersToRemove = new ArrayList<>();
 
+        for(int i = 0; i < g.getPlayers().size(); i++) {
+            if(g.getPlayers().get(i).getPlayerCards().size() == 0) {
+                playersToRemove.add(g.getPlayers().get(i));
+            }
+        }
+
+        for (Player player : playersToRemove) {
+            g.getPlayers().removePlayer(player);
+        }
+    }
+
+    private void getNeedCard(Game g) {
+        LinkedList<Card> deck = g.getDeck();
+        CyclicLinkedList<Player> players = g.getPlayers();
+
+        for(int i = 0; i < players.size(); i++) {
+            if(players.get(i).getPlayerCards().size() < 6 && g.getDeck().size() != 0) {
+                ArrayList<Card> playerCards = players.get(i).getPlayerCards();
+                playerCards.add(deck.removeLast());
+                players.get(i).setPlayerCards(playerCards);
+            }
+        }
+
+        g.setDeck(deck);
+        g.setPlayers(players);
+    }
+
+    private void defense(Game g, Player source, Player target) {
+        ArrayList<Card> targetCards = sortCards(target.getPlayerCards());
+        ArrayList<Card> targetCardsStart = sortCards(target.getPlayerCards());
+        ArrayList<Card> cardsToDefine = sortCards(g.getCardsOnDesk());
+        ArrayList<Fight> fights = new ArrayList<>();
+
+        Iterator<Card> cardsToDefineIterator = cardsToDefine.iterator();
+
+        while (cardsToDefineIterator.hasNext() && !g.isPickedUp()) {
+            Card cardToDefine = cardsToDefineIterator.next();
+            Card selectedCard = cardSelection(g, cardToDefine, targetCards);
+            if(selectedCard != cardToDefine) { // если можем отбить
+                targetCards.remove(selectedCard); // бьем картой отбивающего
+                cardsToDefineIterator.remove(); // побили карту с стола
+                fights.add(new Fight(cardToDefine, selectedCard));
+            }else {
+                System.out.println(target.getName() + " игрок потянул");
+                g.setPickedUp(true);
+                fights.add(new Fight(cardToDefine));
+            }
+        }
+        if(g.isPickedUp()) {
+            ArrayList<Card> cardsForTarget = new ArrayList<>(g.getCardsOnDesk());
+            cardsForTarget.addAll(targetCardsStart);
+            target.setPlayerCards(cardsForTarget);
+            g.setCardsOnDesk(new ArrayList<Card>());
+            Round round = new Round(source, target, fights);
+            ArrayList<Round> allRound =  g.getFightHistory();
+            allRound.add(round);
+            g.setFightHistory(allRound);
+        }else { // заполняем историю сражения
+            Round round = new Round(source, target, fights);
+            ArrayList<Round> allRound =  g.getFightHistory();
+            allRound.add(round);
+            g.setFightHistory(allRound);
+            g.setCardsOnDesk(new ArrayList<Card>());
+        }
+    }
+
+    private Card cardSelection(Game g, Card toDefine, ArrayList<Card> targetCards) {
+        boolean isTrump = g.getTrump().getSuit() == toDefine.getSuit();
+        if(!isTrump) {
+            for (Card card: targetCards) {
+                if(card.getSuit() == toDefine.getSuit() && card.getFace().getRank() > toDefine.getFace().getRank()) {
+                    return card;
+                }
+            }
+            for (Card card: targetCards) {
+                if(card.getSuit() == g.getTrump().getSuit()) {
+                    return card;
+                }
+            }
+        }else{
+            for (Card card: targetCards) {
+                if(card.getSuit() == toDefine.getSuit() && card.getFace().getRank() > toDefine.getFace().getRank()) {
+                    return card;
+                }
+            }
+        }
+        return toDefine;
+    }
+
+    private void attack(Game g, Player source, Player target) {
         putSourceCards(g, source);
         putSimilarCards(g, target);
     }
@@ -118,11 +244,17 @@ public class GameService {
                 }
             }
         }
-        // TODO delete the player if he doesn't have any cards
+        int size = g.getPlayers().size();
+        for(int i = 0; i < size; i++) {
+            if(g.getPlayers().get(i).getPlayerCards().size() == 0) {
+                g.getPlayers().removePlayer(i);
+            }
+        }
+        g.setCardsOnDesk(cardsToAdd);
     }
 
     private void putSourceCards(Game g, Player source) {
-        ArrayList<Card> cards = g.getCardsOnDesk();
+        ArrayList<Card> cards = new ArrayList<>();
         cards.add(source.getPlayerCards().remove(0));
         g.setCardsOnDesk(cards);
     }
@@ -135,6 +267,7 @@ public class GameService {
         CyclicLinkedList<Player> players = g.getPlayers();
         Map<Player, Card> highCard = new HashMap<>();
         Optional<Map.Entry<Player, Card>> high;
+
         if(g.getTrump().getFace().getRank() < 11) {
             for (int i = 0; i < players.size(); i++) {
                 ArrayList<Card> cards = players.get(i).getPlayerCards();
@@ -163,16 +296,16 @@ public class GameService {
     }
 
     private boolean isFirstRound(Game g) {
-        return g.getFightHistory() == null;
+        return g.getFightHistory().size() == 0;
     }
 
     private boolean isGameAlive(Game g){
         return g.getPlayers().size() > 1;
     }
 
-    private Player getSourcePlayer(Game g, boolean isPickedUp, Player previousSource) {
+    private Player getSourcePlayer(Game g, Player previousSource) {
         Player player;
-        if (!isPickedUp) {
+        if (!g.isPickedUp()) {
             player = g.getNext(previousSource);
         } else {
             player = g.getNext(g.getNext(previousSource));
