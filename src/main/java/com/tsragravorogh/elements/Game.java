@@ -11,6 +11,7 @@ public class Game {
     private CyclicLinkedList<Player> players;
     private ArrayList<Round> fightHistory;
     private ArrayList<Card> cardsOnDesk;
+    private ArrayList<Player> winnerList;
     private boolean isPickedUp;
 
     public Game() {
@@ -66,6 +67,13 @@ public class Game {
 
     public void setPickedUp(boolean pickedUp) {
         isPickedUp = pickedUp;
-        if (pickedUp) System.out.println("потянул");
+    }
+
+    public ArrayList<Player> getWinnerList() {
+        return winnerList;
+    }
+
+    public void setWinnerList(ArrayList<Player> winnerList) {
+        this.winnerList = winnerList;
     }
 }
