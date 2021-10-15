@@ -16,6 +16,10 @@ public class GameService {
         // TODO init the game
     }
 
+    private void greetings() {
+        System.out.println("HELLO!!!!!");
+    }
+
     private void initPlayers(Game g, int count) {
         CyclicLinkedList<Player> players = new CyclicLinkedList<>();
 
@@ -48,10 +52,11 @@ public class GameService {
         g.setWinnerList(new ArrayList<>());
     }
 
-    private LinkedList<Card> shuffle(LinkedList<Card> cards) {
-        List<Card> cardsTmp = new ArrayList<>(cards);
-        Collections.shuffle(cardsTmp);
-        return new LinkedList<>(cardsTmp);
+    private void shuffle(LinkedList<Card> cards) {
+        //List<Card> cardsTmp = new ArrayList<>(cards);
+       // Collections.shuffle(cardsTmp);
+        Collections.shuffle(cards);
+        //return new LinkedList<>(cardsTmp);
     }
 
     private void dealCardsToPlayers(Game g){
@@ -243,6 +248,9 @@ public class GameService {
                 g.getPlayers().removePlayer(i);
             }
         }
+
+
+
         g.setCardsOnDesk(cardsToAdd);
         return didSourceWin ? beforeSource : source;
     }
