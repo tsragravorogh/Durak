@@ -16,6 +16,15 @@ public class GameService {
         // TODO init the game
     }
 
+    private void sayBuy() {
+
+        System.out.println("buuuuy!");
+    }
+
+    public void greteegs() {
+        System.out.println("hello");
+    }
+
     private void initPlayers(Game g, int count) {
         CyclicLinkedList<Player> players = new CyclicLinkedList<>();
 
