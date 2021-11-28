@@ -7,6 +7,6 @@ public class app {
     public static void main(String[] args) {
         Game game = new Game();
         GameService svc = new GameService();
-        svc.play(game, 4);
+        svc.play(game, 6);
     }
 }

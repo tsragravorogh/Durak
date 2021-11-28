@@ -16,15 +16,6 @@ public class GameService {
         // TODO init the game
     }
 
-    private void sayBuy() {
-
-        System.out.println("buuuuy!");
-    }
-
-    public void greteegs() {
-        System.out.println("hello");
-    }
-
     private void initPlayers(Game g, int count) {
         CyclicLinkedList<Player> players = new CyclicLinkedList<>();
 
@@ -44,7 +35,7 @@ public class GameService {
             }
         }
 
-        deck = shuffle(deck);
+        shuffle(deck);
 
         Card trump = deck.getFirst();
         g.setTrump(trump);
@@ -57,10 +48,8 @@ public class GameService {
         g.setWinnerList(new ArrayList<>());
     }
 
-    private LinkedList<Card> shuffle(LinkedList<Card> cards) {
-        List<Card> cardsTmp = new ArrayList<>(cards);
-        Collections.shuffle(cardsTmp);
-        return new LinkedList<>(cardsTmp);
+    private void shuffle(LinkedList<Card> cards) {
+        Collections.shuffle(cards);
     }
 
     private void dealCardsToPlayers(Game g){
@@ -80,7 +69,7 @@ public class GameService {
     private void initGame(Game g) {
         Player source = null;
         Player target;
-
+        SerializeService ss = new SerializeService();
         while (isGameAlive(g)) {
 
             if(isFirstRound(g)){
@@ -92,6 +81,9 @@ public class GameService {
                 target = getTargetPlayer(g, source);
             }
             setConfig(g);
+            if(g.getPlayers().size() == 3) {
+                ss.serialize(g);
+            }
             source = attack(g, source, target);
             defense(g, source, target);
 
@@ -252,6 +244,9 @@ public class GameService {
                 g.getPlayers().removePlayer(i);
             }
         }
+
+
+
         g.setCardsOnDesk(cardsToAdd);
         return didSourceWin ? beforeSource : source;
     }
@@ -277,7 +272,7 @@ public class GameService {
             for (int i = 0; i < players.size(); i++) {
                 ArrayList<Card> cards = players.get(i).getPlayerCards();
 
-                cards.stream().filter(c -> c.getSuit() == g.getTrump().getSuit()).filter(c -> c.getFace().getRank() > g.getTrump().getFace().getRank()).collect(Collectors.toCollection(ArrayList::new));
+                cards = cards.stream().filter(c -> c.getSuit() == g.getTrump().getSuit()).filter(c -> c.getFace().getRank() > g.getTrump().getFace().getRank()).collect(Collectors.toCollection(ArrayList::new));
                 Optional<Card> c = cards.stream().max(Comparator.comparingInt(e -> e.getFace().getRank()));
                 if(c.isPresent()) {
                     highCard.put(players.get(i), c.get());
@@ -288,7 +283,7 @@ public class GameService {
             for (int i = 0; i < players.size(); i++) {
                 ArrayList<Card> cards = players.get(i).getPlayerCards();
 
-                cards.stream().filter(c -> c.getSuit() == g.getTrump().getSuit()).filter(c -> c.getFace().getRank() < g.getTrump().getFace().getRank()).collect(Collectors.toCollection(ArrayList::new));
+                cards = cards.stream().filter(c -> c.getSuit() == g.getTrump().getSuit()).filter(c -> c.getFace().getRank() < g.getTrump().getFace().getRank()).collect(Collectors.toCollection(ArrayList::new));
                 Optional<Card> c = cards.stream().max(Comparator.comparingInt(e -> e.getFace().getRank()));
 
                 if(c.isPresent()){
