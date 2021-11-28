@@ -2,18 +2,21 @@ package com.tsragravorogh.services;
 
 import com.tsragravorogh.elements.*;
 import com.tsragravorogh.utils.CyclicLinkedList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameService {
+    Logger logger = LoggerFactory.getLogger(GameService.class);
+
     public void play(Game g, int playersCount) {
         initPlayers(g, playersCount);
         initCards(g);
         dealCardsToPlayers(g);
         initHistory(g);
         initGame(g);
-        // TODO init the game
     }
 
     private void initPlayers(Game g, int count) {
@@ -61,29 +64,36 @@ public class GameService {
                 cardsToPlayer.add(deck.removeLast());
             }
             players.get(i).setPlayerCards(cardsToPlayer);
+            logger.info("Player " + (i + 1) + " got cards: {}", cardsToPlayer.toString());
         }
         g.setPlayers(players);
         g.setDeck(deck);
     }
 
     private void initGame(Game g) {
+        logger.info("Game is started");
         Player source = null;
         Player target;
-        SerializeService ss = new SerializeService();
+//        SerializeService ss = new SerializeService();
+//        g = ss.deserialize();
         while (isGameAlive(g)) {
 
             if(isFirstRound(g)){
                 source = getFirstSourcePlayer(g);
+                logger.info("First source Player is {}", source.getName());
                 target = g.getPlayers().getNext(source);
+                logger.info("First target Player is {}", target.getName());
             }
             else{
                 source = getSourcePlayer(g, source);
+                logger.info("Source Player is {}", source.getName());
                 target = getTargetPlayer(g, source);
+                logger.info("Target Player is {}", target.getName());
             }
             setConfig(g);
-            if(g.getPlayers().size() == 3) {
-                ss.serialize(g);
-            }
+//            if(g.getPlayers().size() == 3) {
+//                ss.serialize(g);
+//            }
             source = attack(g, source, target);
             defense(g, source, target);
 
@@ -92,13 +102,14 @@ public class GameService {
             }
             removeWinningPlayers(g);
         }
+        logger.info("Game is ended");
         showRatingList(g);
     }
 
     private void showRatingList(Game g) {
         g.getWinnerList().add(g.getPlayers().get(0));
         for(int i = 0; i < g.getWinnerList().size(); i++) {
-            System.out.println("Игрок " + g.getWinnerList().get(i) + " занял " + (i + 1) + " место");
+            System.out.println("Player " + g.getWinnerList().get(i) + " has got " + (i + 1) + " place");
         }
     }
 
@@ -111,6 +122,7 @@ public class GameService {
 
         for(int i = 0; i < g.getPlayers().size(); i++) {
             if(g.getPlayers().get(i).getPlayerCards().size() == 0) {
+                logger.info(g.getPlayers().get(i) + " won and out of the game");
                 playersToRemove.add(g.getPlayers().get(i));
                 g.getWinnerList().add(g.getPlayers().get(i));
             }
@@ -169,6 +181,7 @@ public class GameService {
             ArrayList<Round> allRound =  g.getFightHistory();
             allRound.add(round);
             g.setFightHistory(allRound);
+            logger.info("Target player was picked up cards: {}", target.getName());
         }else { // заполняем историю сражения
             Round round = new Round(source, target, fights);
             ArrayList<Round> allRound =  g.getFightHistory();
@@ -237,6 +250,7 @@ public class GameService {
         int size = g.getPlayers().size();
         for(int i = 0; i < size; i++) {
             if(g.getPlayers().get(i).getPlayerCards().size() == 0) {
+                logger.info(g.getPlayers().get(i) + " won and out of the game");
                 if(g.getPlayers().get(i) == source) {
                     didSourceWin = true;
                 }
@@ -248,6 +262,7 @@ public class GameService {
 
 
         g.setCardsOnDesk(cardsToAdd);
+        logger.info("Cards on the desk {}", cardsToAdd);
         return didSourceWin ? beforeSource : source;
     }
 
